@@ -1,0 +1,58 @@
+.slider {
+    position: relative;
+    width: 200px;
+    margin: auto;
+  }
+  
+  .slider-image {
+    width: 100%;
+    border-radius: 10px;
+    transition: transform 0.4s ease;
+  }
+  
+  /* 🔍 hover zoom */
+  .slider:hover .slider-image {
+    transform: scale(1.05);
+  }
+  
+  /* arrows */
+  .nav {
+    position: absolute;
+    top: 45%;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  
+  .left { left: -10px; }
+  .right { right: -10px; }
+  
+  .nav:hover {
+    background: #007bff;
+  }
+  
+  /* dots */
+  .dots {
+    text-align: center;
+    margin-top: 6px;
+  }
+  
+  .dot {
+    height: 10px;
+    width: 10px;
+    margin: 3px;
+    background: #ccc;
+    display: inline-block;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .dot.active {
+    background: #007bff;
+    transform: scale(1.2);
+  }
+  
