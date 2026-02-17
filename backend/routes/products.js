@@ -29,9 +29,13 @@ router.get("/", async (req, res) => {
       }
 
       if (row.image_url) {
-        const fullUrl = `${req.protocol}://${req.get("host")}${row.image_url}`;
-        products[row.id].images.push(fullUrl);
-      }
+        if (row.image_url.startsWith("http")) {
+          products[row.id].images.push(row.image_url);
+        } else {
+          const fullUrl = `${req.protocol}://${req.get("host")}${row.image_url}`;
+          products[row.id].images.push(fullUrl);
+        }
+      }      
     });
 
     res.json(Object.values(products));
