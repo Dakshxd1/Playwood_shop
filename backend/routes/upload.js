@@ -1,31 +1,21 @@
 const router = require("express").Router();
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 const db = require("../db");
-const path = require("path");
-const fs = require("fs");
 
-// ✅ Ensure uploads folder exists
-const uploadDir = path.join(__dirname, "..", "uploads");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// ✅ Storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);   // absolute path
+// ✅ Cloudinary storage setup
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "plywood-shop",
+    allowed_formats: ["jpg", "jpeg", "png"],
   },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const cleanName = Date.now() + ext;
-    cb(null, cleanName);
-  }
 });
 
 const upload = multer({ storage });
 
-// ✅ Upload multiple images
+// ✅ Upload images to Cloudinary
 router.post("/:productId", upload.array("images", 4), async (req, res) => {
   try {
     const productId = req.params.productId;
@@ -35,15 +25,16 @@ router.post("/:productId", upload.array("images", 4), async (req, res) => {
     }
 
     for (const file of req.files) {
+      // Cloudinary URL is in file.path
       await db.query(
         "INSERT INTO product_images (product_id, image_url) VALUES (?, ?)",
-        [productId, `/uploads/${file.filename}`]
+        [productId, file.path]
       );
     }
 
-    res.json({ message: "Images uploaded successfully" });
+    res.json({ message: "Images uploaded to Cloudinary" });
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error("Cloudinary upload error:", err);
     res.status(500).json({ error: "Upload failed" });
   }
 });
