@@ -1,7 +1,10 @@
 const router = require("express").Router();
 const db = require("../db");
+const adminAuth = require("../middleware/adminAuth");
 
-// ✅ GET all products
+// ==============================
+// ✅ GET ALL PRODUCTS (Public)
+// ==============================
 router.get("/", async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -26,7 +29,6 @@ router.get("/", async (req, res) => {
       }
 
       if (row.image_url) {
-        // ✅ Use live host instead of localhost
         const fullUrl = `${req.protocol}://${req.get("host")}${row.image_url}`;
         products[row.id].images.push(fullUrl);
       }
@@ -39,8 +41,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ ADD PRODUCT (FIX 404)
-router.post("/", async (req, res) => {
+// ==============================
+// 🔒 ADD PRODUCT (Admin Only)
+// ==============================
+router.post("/", adminAuth, async (req, res) => {
   try {
     const { name, type, thickness, price_per_sqft, description } = req.body;
 
@@ -53,6 +57,26 @@ router.post("/", async (req, res) => {
     res.json({ id: result.insertId });
   } catch (err) {
     console.error("Add product error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ==============================
+// 🔒 DELETE PRODUCT (Admin Only)
+// ==============================
+router.delete("/:id", adminAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // delete images first
+    await db.query("DELETE FROM product_images WHERE product_id = ?", [id]);
+
+    // delete product
+    await db.query("DELETE FROM products WHERE id = ?", [id]);
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (err) {
+    console.error("Delete error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
