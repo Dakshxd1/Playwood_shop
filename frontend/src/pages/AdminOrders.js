@@ -3,21 +3,31 @@ import api from "../api";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 🔹 Load orders
+  const loadOrders = async () => {
+    try {
+      const res = await api.get("/orders", {
+        headers: {
+          phone: "9812879214",
+          password: "Anshu@123"
+        }
+      });
+
+      setOrders(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to load orders:", err);
+      alert("Failed to load orders");
+    }
+  };
 
   useEffect(() => {
     loadOrders();
   }, []);
 
-  const loadOrders = () => {
-    api.get("/orders", {
-      headers: {
-        phone: "9812879214",
-        password: "Anshu@123"
-      }
-    }).then(res => setOrders(res.data));
-  };
-
-  // ✅ Complete / Remove Order
+  // 🔹 Complete / Remove Order
   const completeOrder = async (id) => {
     if (!window.confirm("Mark this order as completed?")) return;
 
@@ -29,14 +39,17 @@ export default function AdminOrders() {
         }
       });
 
-      setOrders(orders.filter(o => o.id !== id));
-      alert("Order completed");
+      // ✅ Reload orders from server (safe & correct)
+      loadOrders();
+
+      alert("Order completed & removed");
     } catch (err) {
-      console.error(err);
+      console.error("Delete failed:", err.response?.data || err.message);
       alert("Failed to remove order");
     }
   };
 
+  if (loading) return <p>Loading orders...</p>;
   if (!orders.length) return <p>No orders yet</p>;
 
   return (
@@ -57,7 +70,6 @@ export default function AdminOrders() {
             </p>
           ))}
 
-          {/* ✅ Complete button */}
           <button
             onClick={() => completeOrder(order.id)}
             style={completeBtn}
