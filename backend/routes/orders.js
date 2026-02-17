@@ -60,4 +60,25 @@ router.post("/", async (req, res) => {
   }
 });
 
+// ==============================
+// 🔒 DELETE ORDER (Admin Only)
+// ==============================
+router.delete("/:id", adminAuth, async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    // delete order items first
+    await db.query("DELETE FROM order_items WHERE order_id = ?", [orderId]);
+
+    // delete order
+    await db.query("DELETE FROM orders WHERE id = ?", [orderId]);
+
+    res.json({ message: "Order completed & removed" });
+  } catch (err) {
+    console.error("Delete order error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 module.exports = router;

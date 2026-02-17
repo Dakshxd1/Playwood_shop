@@ -5,18 +5,37 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = () => {
     api.get("/orders", {
       headers: {
         phone: "9812879214",
         password: "Anshu@123"
       }
-    })
-    .then(res => setOrders(res.data))
-    .catch(err => {
-      console.error("Failed to load orders", err);
-      alert("Failed to load orders");
-    });
-  }, []);
+    }).then(res => setOrders(res.data));
+  };
+
+  // ✅ Complete / Remove Order
+  const completeOrder = async (id) => {
+    if (!window.confirm("Mark this order as completed?")) return;
+
+    try {
+      await api.delete(`/orders/${id}`, {
+        headers: {
+          phone: "9812879214",
+          password: "Anshu@123"
+        }
+      });
+
+      setOrders(orders.filter(o => o.id !== id));
+      alert("Order completed");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to remove order");
+    }
+  };
 
   if (!orders.length) return <p>No orders yet</p>;
 
@@ -37,6 +56,14 @@ export default function AdminOrders() {
               {item.name} — {item.length}ft × {item.width}ft — Qty: {item.quantity}
             </p>
           ))}
+
+          {/* ✅ Complete button */}
+          <button
+            onClick={() => completeOrder(order.id)}
+            style={completeBtn}
+          >
+            ✔ Complete Order
+          </button>
         </div>
       ))}
     </div>
@@ -49,4 +76,14 @@ const cardStyle = {
   padding: 10,
   borderRadius: 8,
   background: "#fafafa"
+};
+
+const completeBtn = {
+  marginTop: 10,
+  padding: "6px 12px",
+  background: "#28a745",
+  color: "white",
+  border: "none",
+  borderRadius: 4,
+  cursor: "pointer"
 };
