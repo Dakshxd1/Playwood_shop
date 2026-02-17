@@ -4,6 +4,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import AdminOrders from "./pages/AdminOrders";
 import "./styles.css";
 
 function App() {
@@ -22,6 +23,10 @@ function App() {
           <button onClick={() => setPage("cart")}>Cart ({cart.length})</button>
           <button onClick={() => setPage("checkout")}>Checkout</button>
           <button onClick={() => setPage("admin")}>Admin</button>
+
+          {/* ✅ NEW BUTTON */}
+          <button onClick={() => setPage("orders")}>Orders</button>
+
           <button onClick={() => setDark(!dark)}>
             {dark ? "Light" : "Dark"} Mode
           </button>
@@ -31,9 +36,19 @@ function App() {
       {page === "home" && <Home cart={cart} setCart={setCart} />}
       {page === "cart" && <Cart cart={cart} />}
       {page === "checkout" && <Checkout cart={cart} setCart={setCart} />}
+
+      {/* Admin login protection */}
       {page === "admin" &&
         (isAdmin ? (
           <AdminDashboard isAdmin={isAdmin} />
+        ) : (
+          <AdminLogin setIsAdmin={setIsAdmin} />
+        ))}
+
+      {/* 🔒 Orders page only for admin */}
+      {page === "orders" &&
+        (isAdmin ? (
+          <AdminOrders />
         ) : (
           <AdminLogin setIsAdmin={setIsAdmin} />
         ))}

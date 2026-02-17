@@ -1,23 +1,31 @@
 const router = require("express").Router();
 const db = require("../db");
+const adminAuth = require("../middleware/adminAuth");
 
-// ✅ Get all orders
-router.get("/", async (req, res) => {
+// 🔒 ADMIN: GET ALL ORDERS
+router.get("/", adminAuth, async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT o.*, oi.product_id, oi.length, oi.width, oi.quantity, oi.total_price
-      FROM orders o
-      LEFT JOIN order_items oi ON o.id = oi.order_id
+    const [orders] = await db.query("SELECT * FROM orders ORDER BY id DESC");
+
+    const [items] = await db.query(`
+      SELECT oi.*, p.name
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
     `);
 
-    res.json(rows);
+    const result = orders.map(order => ({
+      ...order,
+      items: items.filter(i => i.order_id === order.id)
+    }));
+
+    res.json(result);
   } catch (err) {
-    console.error("Orders fetch error:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// ✅ Place order
+// PUBLIC: PLACE ORDER
 router.post("/", async (req, res) => {
   try {
     const { customer_name, phone, address, items } = req.body;
@@ -47,7 +55,7 @@ router.post("/", async (req, res) => {
 
     res.json({ message: "Order placed successfully" });
   } catch (err) {
-    console.error("Order error:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
