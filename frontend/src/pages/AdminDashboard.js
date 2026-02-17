@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ isAdmin }) {
   const [product, setProduct] = useState({
     name: "",
     type: "",
@@ -13,15 +13,16 @@ export default function AdminDashboard() {
   const [images, setImages] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // 🔹 Load products
+  // Load products
   useEffect(() => {
     api.get("/products").then(res => setProducts(res.data));
   }, []);
 
-  // 🔹 Add Product
+  // Add Product (Admin only)
   const addProduct = async () => {
+    if (!isAdmin) return alert("Admin login required");
+
     try {
-      // ✅ Send admin headers
       const res = await api.post("/products", product, {
         headers: {
           phone: "9812879214",
@@ -31,20 +32,14 @@ export default function AdminDashboard() {
 
       const productId = res.data.id;
 
-      // Upload images
       if (images.length > 0) {
         const formData = new FormData();
         images.forEach(img => formData.append("images", img));
 
-        await api.post(`/upload/${productId}`, formData, {
-          headers: {
-            phone: "9812879214",
-            password: "Anshu@123"
-          }
-        });
+        await api.post(`/upload/${productId}`, formData);
       }
 
-      alert("Product added successfully!");
+      alert("Product added!");
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -52,8 +47,10 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🔹 Delete Product
+  // Delete product
   const deleteProduct = async (id) => {
+    if (!isAdmin) return;
+
     try {
       await api.delete(`/products/${id}`, {
         headers: {
@@ -62,8 +59,8 @@ export default function AdminDashboard() {
         }
       });
 
-      alert("Product deleted");
       setProducts(products.filter(p => p.id !== id));
+      alert("Deleted");
     } catch (err) {
       console.error(err);
       alert("Delete failed");
@@ -75,15 +72,19 @@ export default function AdminDashboard() {
       <h2>Admin Dashboard</h2>
 
       {/* Add Product Form */}
-      <input placeholder="Name" onChange={e => setProduct({ ...product, name: e.target.value })} />
-      <input placeholder="Type" onChange={e => setProduct({ ...product, type: e.target.value })} />
-      <input placeholder="Thickness" onChange={e => setProduct({ ...product, thickness: e.target.value })} />
-      <input placeholder="Price per sqft" onChange={e => setProduct({ ...product, price_per_sqft: e.target.value })} />
-      <textarea placeholder="Description" onChange={e => setProduct({ ...product, description: e.target.value })} />
+      {isAdmin && (
+        <>
+          <input placeholder="Name" onChange={e => setProduct({ ...product, name: e.target.value })} />
+          <input placeholder="Type" onChange={e => setProduct({ ...product, type: e.target.value })} />
+          <input placeholder="Thickness" onChange={e => setProduct({ ...product, thickness: e.target.value })} />
+          <input placeholder="Price per sqft" onChange={e => setProduct({ ...product, price_per_sqft: e.target.value })} />
+          <textarea placeholder="Description" onChange={e => setProduct({ ...product, description: e.target.value })} />
 
-      <input type="file" multiple onChange={e => setImages([...e.target.files])} />
+          <input type="file" multiple onChange={e => setImages([...e.target.files])} />
 
-      <button onClick={addProduct}>Add Product</button>
+          <button onClick={addProduct}>Add Product</button>
+        </>
+      )}
 
       <hr />
 
@@ -94,7 +95,9 @@ export default function AdminDashboard() {
           <p><b>{product.name}</b></p>
           <p>₹ {product.price_per_sqft}/sqft</p>
 
-          <button onClick={() => deleteProduct(product.id)}>Delete</button>
+          {isAdmin && (
+            <button onClick={() => deleteProduct(product.id)}>Delete</button>
+          )}
         </div>
       ))}
     </div>
