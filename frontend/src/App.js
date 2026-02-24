@@ -61,10 +61,9 @@ const headerStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   padding: "10px 20px",
-  background: "#007bff",
+  background: "#5a3e2b",
   color: "white",
-  borderRadius: "8px",
-  marginBottom: "20px"
+  marginBottom: "10px"   // reduced from 20px
 };
 
 export default App;
