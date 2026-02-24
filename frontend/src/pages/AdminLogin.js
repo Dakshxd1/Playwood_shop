@@ -14,21 +14,11 @@ export default function AdminLogin({ setIsAdmin }) {
   };
 
   return (
-    <div style={{ maxWidth: 300, margin: "50px auto" }}>
+    <div className="panel" style={{ maxWidth: 350, margin: "50px auto" }}>
       <h2>Admin Login</h2>
 
-      <input
-        placeholder="Phone"
-        value={phone}
-        onChange={e => setPhone(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
+      <input placeholder="Phone" value={phone} onChange={e => setPhone(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
 
       <button onClick={login}>Login</button>
     </div>

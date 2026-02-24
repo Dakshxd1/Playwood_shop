@@ -4,15 +4,15 @@ export default function Cart({ cart }) {
   const total = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div>
+    <div className="panel">
       <h2>Your Cart</h2>
 
       {cart.length === 0 && <p>Cart is empty</p>}
 
       {cart.map((item, i) => (
-        <div key={i} style={itemStyle}>
+        <div key={i} className="card">
           <p><strong>{item.product.name}</strong></p>
-          <p>Size: {item.length} x {item.width}</p>
+          <p>Size: {item.length} × {item.width} ft</p>
           <p>₹ {item.price}</p>
         </div>
       ))}
@@ -21,10 +21,3 @@ export default function Cart({ cart }) {
     </div>
   );
 }
-
-const itemStyle = {
-  border: "1px solid #ccc",
-  padding: "10px",
-  margin: "10px 0",
-  borderRadius: "8px"
-};

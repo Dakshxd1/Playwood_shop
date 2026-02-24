@@ -33,27 +33,17 @@ export default function Checkout({ cart, setCart }) {
       alert("✅ Order placed successfully!");
       setCart([]);
     } catch (err) {
-      console.error(err);
       alert("Order failed");
     }
   };
 
   return (
-    <div>
+    <div className="panel">
       <h2>Checkout</h2>
 
-      <input
-        placeholder="Name"
-        onChange={e => setForm({ ...form, name: e.target.value })}
-      />
-      <input
-        placeholder="Phone"
-        onChange={e => setForm({ ...form, phone: e.target.value })}
-      />
-      <textarea
-        placeholder="Address"
-        onChange={e => setForm({ ...form, address: e.target.value })}
-      />
+      <input placeholder="Name" onChange={e => setForm({ ...form, name: e.target.value })} />
+      <input placeholder="Phone" onChange={e => setForm({ ...form, phone: e.target.value })} />
+      <textarea placeholder="Address" onChange={e => setForm({ ...form, address: e.target.value })} />
 
       <h3>Total: ₹{total}</h3>
 

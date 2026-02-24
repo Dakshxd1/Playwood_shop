@@ -39,10 +39,8 @@ export default function AdminOrders() {
         }
       });
 
-      // ✅ Reload orders from server (safe & correct)
-      loadOrders();
-
-      alert("Order completed & removed");
+      setOrders(orders.filter(o => o.id !== id));
+      alert("✅ Order completed & removed");
     } catch (err) {
       console.error("Delete failed:", err.response?.data || err.message);
       alert("Failed to remove order");
@@ -53,21 +51,27 @@ export default function AdminOrders() {
   if (!orders.length) return <p>No orders yet</p>;
 
   return (
-    <div>
+    <div className="panel">
       <h2>Customer Orders</h2>
 
       {orders.map(order => (
-        <div key={order.id} style={cardStyle}>
-          <p><b>Order ID:</b> {order.id}</p>
+        <div key={order.id} className="card">
+          <div style={headerRow}>
+            <h3>Order #{order.id}</h3>
+            <span style={statusBadge}>Pending</span>
+          </div>
+
           <p><b>Name:</b> {order.customer_name}</p>
           <p><b>Phone:</b> {order.phone}</p>
           <p><b>Address:</b> {order.address}</p>
 
           <h4>Items:</h4>
           {order.items.map(item => (
-            <p key={item.id}>
-              {item.name} — {item.length}ft × {item.width}ft — Qty: {item.quantity}
-            </p>
+            <div key={item.id} style={itemRow}>
+              <span>{item.name}</span>
+              <span>{item.length} × {item.width} ft</span>
+              <span>Qty: {item.quantity}</span>
+            </div>
           ))}
 
           <button
@@ -82,20 +86,35 @@ export default function AdminOrders() {
   );
 }
 
-const cardStyle = {
-  border: "1px solid #ccc",
-  margin: 10,
-  padding: 10,
-  borderRadius: 8,
-  background: "#fafafa"
+/* 🎨 Styles */
+const headerRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center"
+};
+
+const itemRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "4px 0",
+  borderBottom: "1px solid #eee"
+};
+
+const statusBadge = {
+  background: "#ffc107",
+  padding: "4px 8px",
+  borderRadius: "6px",
+  fontSize: "12px",
+  fontWeight: "bold"
 };
 
 const completeBtn = {
-  marginTop: 10,
-  padding: "6px 12px",
+  marginTop: 12,
+  padding: "8px 14px",
   background: "#28a745",
   color: "white",
   border: "none",
-  borderRadius: 4,
-  cursor: "pointer"
+  borderRadius: 6,
+  cursor: "pointer",
+  fontWeight: "bold"
 };
