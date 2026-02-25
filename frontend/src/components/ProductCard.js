@@ -11,23 +11,22 @@ export default function ProductCard({ product, addToCart }) {
     <div className="card">
       <ImageSlider images={product.images} />
 
+      {/* ✅ CATEGORY BADGE */}
+      <p className="badge">{product.type}</p>
+
       <h3>{product.name}</h3>
-      <p>Thickness: {product.thickness}</p>
-      <p>₹{product.price_per_sqft} / sqft</p>
+      {product.thickness && <p>Thickness: {product.thickness}</p>}
 
-      <input
-        type="number"
-        placeholder="Length (ft)"
-        onChange={e => setLength(e.target.value)}
-      />
+      <p>₹{product.price_per_sqft}</p>
 
-      <input
-        type="number"
-        placeholder="Width (ft)"
-        onChange={e => setWidth(e.target.value)}
-      />
-
-      <p>Total: ₹{totalPrice}</p>
+      {/* Show size inputs only for plywood/timber */}
+      {(product.type === "Plywood" || product.type === "Timber" || product.type === "Door") && (
+        <>
+          <input type="number" placeholder="Length (ft)" onChange={e => setLength(e.target.value)} />
+          <input type="number" placeholder="Width (ft)" onChange={e => setWidth(e.target.value)} />
+          <p>Total: ₹{totalPrice}</p>
+        </>
+      )}
 
       <button onClick={() => addToCart(product, length, width, totalPrice)}>
         Add to Cart

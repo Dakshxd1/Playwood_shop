@@ -116,3 +116,14 @@ body {
   background: #a67c52;
   color: white;
 }
+
+/* Category badge */
+.badge {
+  display: inline-block;
+  background: #a67c52;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}

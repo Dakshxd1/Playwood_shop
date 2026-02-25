@@ -41,8 +41,6 @@ export default function AdminDashboard({ isAdmin }) {
   };
 
   const deleteProduct = async (id) => {
-    if (!isAdmin) return;
-
     await api.delete(`/products/${id}`, {
       headers: { phone: "9812879214", password: "Anshu@123" }
     });
@@ -55,10 +53,23 @@ export default function AdminDashboard({ isAdmin }) {
       <h2>Admin Dashboard</h2>
 
       <h3>Add Product</h3>
+
       <input placeholder="Name" onChange={e => setProduct({ ...product, name: e.target.value })} />
-      <input placeholder="Type" onChange={e => setProduct({ ...product, type: e.target.value })} />
+
+      {/* ✅ CATEGORY DROPDOWN */}
+      <select onChange={e => setProduct({ ...product, type: e.target.value })}>
+        <option value="">Select Category</option>
+        <option value="Plywood">Plywood</option>
+        <option value="Timber">Timber</option>
+        <option value="Door">Door</option>
+        <option value="Door Handle">Door Handle</option>
+        <option value="Panel">Panel</option>
+        <option value="Hardware">Hardware</option>
+        <option value="Screw">Screw</option>
+      </select>
+
       <input placeholder="Thickness" onChange={e => setProduct({ ...product, thickness: e.target.value })} />
-      <input placeholder="Price per sqft" onChange={e => setProduct({ ...product, price_per_sqft: e.target.value })} />
+      <input placeholder="Price" onChange={e => setProduct({ ...product, price_per_sqft: e.target.value })} />
       <textarea placeholder="Description" onChange={e => setProduct({ ...product, description: e.target.value })} />
 
       <input type="file" multiple onChange={e => setImages([...e.target.files])} />
@@ -69,8 +80,9 @@ export default function AdminDashboard({ isAdmin }) {
       <h3>Existing Products</h3>
       {products.map(p => (
         <div key={p.id} className="card">
-          <p><b>{p.name}</b></p>
-          <p>₹ {p.price_per_sqft}/sqft</p>
+          <b>{p.name}</b>
+          <p className="badge">{p.type}</p>
+          <p>₹ {p.price_per_sqft}</p>
           <button onClick={() => deleteProduct(p.id)}>Delete</button>
         </div>
       ))}
