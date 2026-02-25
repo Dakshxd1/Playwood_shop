@@ -2,16 +2,17 @@ import React from "react";
 
 export default function Cart({ cart, setCart }) {
 
-  const updateQty = (index, qty) => {
+  const updateQty = (index, newQty) => {
     const updated = [...cart];
     const item = updated[index];
 
-    item.qty = qty;
+    item.qty = Number(newQty);
 
-    // recalc price
+    const pricePerUnit = Number(item.product.price_per_sqft);
+
     item.price = item.isAreaProduct
-      ? Number(item.length) * Number(item.width) * item.product.price_per_sqft
-      : qty * item.product.price_per_sqft;
+      ? item.length * item.width * pricePerUnit
+      : item.qty * pricePerUnit;
 
     setCart(updated);
   };
@@ -20,7 +21,7 @@ export default function Cart({ cart, setCart }) {
     setCart(cart.filter((_, i) => i !== index));
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
 
   return (
     <div className="panel">
@@ -42,7 +43,7 @@ export default function Cart({ cart, setCart }) {
                 type="number"
                 min="1"
                 value={item.qty}
-                onChange={e => updateQty(i, Number(e.target.value))}
+                onChange={e => updateQty(i, e.target.value)}
               />
             </>
           )}

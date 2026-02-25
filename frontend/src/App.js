@@ -34,7 +34,7 @@ function App() {
       </header>
 
       {page === "home" && <Home cart={cart} setCart={setCart} />}
-      {page === "cart" && <Cart cart={cart} />}
+      {page === "cart" && <Cart cart={cart} setCart={setCart} />}
       {page === "checkout" && <Checkout cart={cart} setCart={setCart} />}
 
       {/* Admin login protection */}

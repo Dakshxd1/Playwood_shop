@@ -6,24 +6,31 @@ export default function ProductCard({ product, addToCart }) {
   const [width, setWidth] = useState("");
   const [qty, setQty] = useState(1);
 
+  const pricePerUnit = Number(product.price_per_sqft);
+
   const isAreaProduct =
     product.type === "Plywood" ||
     product.type === "Timber" ||
     product.type === "Door";
 
   const totalPrice = isAreaProduct
-    ? Number(length) * Number(width) * product.price_per_sqft
-    : qty * product.price_per_sqft;
+    ? Number(length || 0) * Number(width || 0) * pricePerUnit
+    : Number(qty) * pricePerUnit;
 
   const handleAdd = () => {
     if (isAreaProduct && (!length || !width)) {
       return alert("Enter length & width");
     }
 
-    addToCart(product, {
-      length,
-      width,
-      qty,
+    if (!isAreaProduct && qty < 1) {
+      return alert("Enter valid quantity");
+    }
+
+    addToCart({
+      product,
+      length: Number(length),
+      width: Number(width),
+      qty: Number(qty),
       isAreaProduct,
       price: totalPrice
     });
@@ -38,11 +45,8 @@ export default function ProductCard({ product, addToCart }) {
 
       {product.thickness && <p>Thickness: {product.thickness}</p>}
 
-      <p>
-        ₹{product.price_per_sqft} {isAreaProduct ? "/sqft" : "each"}
-      </p>
+      <p>₹{pricePerUnit} {isAreaProduct ? "/sqft" : "each"}</p>
 
-      {/* AREA PRODUCTS */}
       {isAreaProduct ? (
         <>
           <input
@@ -59,7 +63,6 @@ export default function ProductCard({ product, addToCart }) {
           />
         </>
       ) : (
-        /* QUANTITY PRODUCTS */
         <input
           type="number"
           min="1"
@@ -68,7 +71,7 @@ export default function ProductCard({ product, addToCart }) {
         />
       )}
 
-      <p><b>Total: ₹{totalPrice || 0}</b></p>
+      <p><b>Total: ₹{totalPrice}</b></p>
 
       <button onClick={handleAdd}>Add to Cart</button>
     </div>
