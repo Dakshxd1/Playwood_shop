@@ -7,30 +7,48 @@ export default function Home({ cart, setCart }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
 
-  // Load products
+  // 🔹 Load products
   useEffect(() => {
     api.get("/products")
       .then(res => setProducts(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error("Product load error:", err));
   }, []);
 
-  // Add to cart
+  // 🔹 Add to cart (SAFE version)
   const addToCart = (product, details) => {
-    setCart([...cart, { product, ...details }]);
+    if (!details.price || details.price <= 0) {
+      alert("Please enter size or quantity");
+      return;
+    }
+
+    setCart(prevCart => [
+      ...prevCart,
+      {
+        product,
+        ...details
+      }
+    ]);
+
     alert(`${product.name} added to cart`);
   };
 
-  // Filter products
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) &&
-    (category === "" || p.type === category)
-  );
+  // 🔹 Filter products
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      category === "" || p.type === category;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div>
+    <div className="panel">
       <h1>🪵 Plywood & Hardware Shop</h1>
 
-      {/* SEARCH */}
+      {/* 🔍 SEARCH */}
       <input
         type="text"
         placeholder="Search products..."
@@ -39,7 +57,7 @@ export default function Home({ cart, setCart }) {
         style={inputStyle}
       />
 
-      {/* CATEGORY FILTER */}
+      {/* 📂 CATEGORY FILTER */}
       <select
         value={category}
         onChange={e => setCategory(e.target.value)}
@@ -55,15 +73,19 @@ export default function Home({ cart, setCart }) {
         <option value="Screw">Screw</option>
       </select>
 
-      {/* PRODUCT GRID */}
+      {/* 🧱 PRODUCT GRID */}
       <div className="grid">
-        {filteredProducts.map(product => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            addToCart={addToCart}
-          />
-        ))}
+        {filteredProducts.length === 0 ? (
+          <p>No products found</p>
+        ) : (
+          filteredProducts.map(product => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              addToCart={addToCart}
+            />
+          ))
+        )}
       </div>
     </div>
   );

@@ -1,12 +1,17 @@
 import React from "react";
 
 export default function Cart({ cart, setCart }) {
+
   const updateQty = (index, qty) => {
     const updated = [...cart];
-    updated[index].qty = qty;
+    const item = updated[index];
 
-    const price = updated[index].product.price_per_sqft;
-    updated[index].price = qty * price;
+    item.qty = qty;
+
+    // recalc price
+    item.price = item.isAreaProduct
+      ? Number(item.length) * Number(item.width) * item.product.price_per_sqft
+      : qty * item.product.price_per_sqft;
 
     setCart(updated);
   };
@@ -21,18 +26,25 @@ export default function Cart({ cart, setCart }) {
     <div className="panel">
       <h2>Your Cart</h2>
 
+      {cart.length === 0 && <p>Cart is empty</p>}
+
       {cart.map((item, i) => (
         <div key={i} className="card">
           <b>{item.product.name}</b>
 
-          {/* Quantity for hardware */}
-          {!item.length && (
-            <input
-              type="number"
-              min="1"
-              value={item.qty}
-              onChange={e => updateQty(i, e.target.value)}
-            />
+          {/* AREA PRODUCT */}
+          {item.isAreaProduct ? (
+            <p>Size: {item.length} × {item.width} ft</p>
+          ) : (
+            <>
+              <p>Quantity:</p>
+              <input
+                type="number"
+                min="1"
+                value={item.qty}
+                onChange={e => updateQty(i, Number(e.target.value))}
+              />
+            </>
           )}
 
           <p>₹ {item.price}</p>

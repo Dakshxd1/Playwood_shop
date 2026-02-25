@@ -2,20 +2,32 @@ import React, { useState } from "react";
 import ImageSlider from "./ImageSlider";
 
 export default function ProductCard({ product, addToCart }) {
-  const [length, setLength] = useState(0);
-  const [width, setWidth] = useState(0);
+  const [length, setLength] = useState("");
+  const [width, setWidth] = useState("");
   const [qty, setQty] = useState(1);
 
-  // Area-based products
   const isAreaProduct =
     product.type === "Plywood" ||
     product.type === "Timber" ||
     product.type === "Door";
 
-  // Price calculation
   const totalPrice = isAreaProduct
-    ? length * width * product.price_per_sqft
+    ? Number(length) * Number(width) * product.price_per_sqft
     : qty * product.price_per_sqft;
+
+  const handleAdd = () => {
+    if (isAreaProduct && (!length || !width)) {
+      return alert("Enter length & width");
+    }
+
+    addToCart(product, {
+      length,
+      width,
+      qty,
+      isAreaProduct,
+      price: totalPrice
+    });
+  };
 
   return (
     <div className="card">
@@ -30,22 +42,24 @@ export default function ProductCard({ product, addToCart }) {
         ₹{product.price_per_sqft} {isAreaProduct ? "/sqft" : "each"}
       </p>
 
-      {/* AREA INPUTS */}
+      {/* AREA PRODUCTS */}
       {isAreaProduct ? (
         <>
           <input
             type="number"
             placeholder="Length (ft)"
-            onChange={e => setLength(Number(e.target.value))}
+            value={length}
+            onChange={e => setLength(e.target.value)}
           />
           <input
             type="number"
             placeholder="Width (ft)"
-            onChange={e => setWidth(Number(e.target.value))}
+            value={width}
+            onChange={e => setWidth(e.target.value)}
           />
         </>
       ) : (
-        /* QUANTITY INPUT */
+        /* QUANTITY PRODUCTS */
         <input
           type="number"
           min="1"
@@ -54,20 +68,9 @@ export default function ProductCard({ product, addToCart }) {
         />
       )}
 
-      <p><b>Total: ₹{totalPrice}</b></p>
+      <p><b>Total: ₹{totalPrice || 0}</b></p>
 
-      <button
-        onClick={() =>
-          addToCart(product, {
-            length,
-            width,
-            qty,
-            price: totalPrice
-          })
-        }
-      >
-        Add to Cart
-      </button>
+      <button onClick={handleAdd}>Add to Cart</button>
     </div>
   );
 }
