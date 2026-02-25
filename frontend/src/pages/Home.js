@@ -7,14 +7,20 @@ export default function Home({ cart, setCart }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
 
+  // Load products
   useEffect(() => {
-    api.get("/products").then(res => setProducts(res.data));
+    api.get("/products")
+      .then(res => setProducts(res.data))
+      .catch(err => console.error(err));
   }, []);
 
-  const addToCart = (product, length, width, price) => {
-    setCart([...cart, { product, length, width, price }]);
+  // Add to cart
+  const addToCart = (product, details) => {
+    setCart([...cart, { product, ...details }]);
+    alert(`${product.name} added to cart`);
   };
 
+  // Filter products
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) &&
     (category === "" || p.type === category)
@@ -22,38 +28,48 @@ export default function Home({ cart, setCart }) {
 
   return (
     <div>
-      <h1>Plywood & Hardware Shop</h1>
+      <h1>🪵 Plywood & Hardware Shop</h1>
 
+      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search products..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        style={searchStyle}
+        style={inputStyle}
       />
 
-      {/* ✅ CATEGORY FILTER */}
-      <select value={category} onChange={e => setCategory(e.target.value)} style={searchStyle}>
+      {/* CATEGORY FILTER */}
+      <select
+        value={category}
+        onChange={e => setCategory(e.target.value)}
+        style={inputStyle}
+      >
         <option value="">All Categories</option>
         <option value="Plywood">Plywood</option>
         <option value="Timber">Timber</option>
         <option value="Door">Door</option>
         <option value="Door Handle">Door Handle</option>
-        <option value="Panel">Panel</option>
+        <option value="Panel">Panel Sheet</option>
         <option value="Hardware">Hardware</option>
         <option value="Screw">Screw</option>
       </select>
 
+      {/* PRODUCT GRID */}
       <div className="grid">
         {filteredProducts.map(product => (
-          <ProductCard key={product.id} product={product} addToCart={addToCart} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            addToCart={addToCart}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-const searchStyle = {
+const inputStyle = {
   width: "100%",
   padding: "10px",
   marginBottom: "10px",

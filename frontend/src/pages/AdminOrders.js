@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import jsPDF from "jspdf";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -47,6 +48,35 @@ export default function AdminOrders() {
     }
   };
 
+  // 🔹 Download PDF
+  const downloadPDF = (order) => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Plywood Shop - Order Invoice", 20, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Order ID: ${order.id}`, 20, 30);
+    doc.text(`Customer: ${order.customer_name}`, 20, 40);
+    doc.text(`Phone: ${order.phone}`, 20, 50);
+    doc.text(`Address: ${order.address}`, 20, 60);
+
+    let y = 80;
+    doc.text("Items:", 20, y);
+    y += 10;
+
+    order.items.forEach(item => {
+      doc.text(
+        `${item.name} | Qty: ${item.quantity} | ${item.length || "-"} x ${item.width || "-"}`,
+        20,
+        y
+      );
+      y += 10;
+    });
+
+    doc.save(`order_${order.id}.pdf`);
+  };
+
   if (loading) return <p>Loading orders...</p>;
   if (!orders.length) return <p>No orders yet</p>;
 
@@ -69,17 +99,25 @@ export default function AdminOrders() {
           {order.items.map(item => (
             <div key={item.id} style={itemRow}>
               <span>{item.name}</span>
-              <span>{item.length} × {item.width} ft</span>
               <span>Qty: {item.quantity}</span>
+              <span>
+                {item.length ? `${item.length} × ${item.width}` : ""}
+              </span>
             </div>
           ))}
 
-          <button
-            onClick={() => completeOrder(order.id)}
-            style={completeBtn}
-          >
-            ✔ Complete Order
-          </button>
+          <div style={buttonRow}>
+            <button onClick={() => downloadPDF(order)}>
+              📄 Download PDF
+            </button>
+
+            <button
+              onClick={() => completeOrder(order.id)}
+              style={completeBtn}
+            >
+              ✔ Complete Order
+            </button>
+          </div>
         </div>
       ))}
     </div>
@@ -96,8 +134,14 @@ const headerRow = {
 const itemRow = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "4px 0",
-  borderBottom: "1px solid #eee"
+  borderBottom: "1px solid #eee",
+  padding: "4px 0"
+};
+
+const buttonRow = {
+  display: "flex",
+  gap: "10px",
+  marginTop: "10px"
 };
 
 const statusBadge = {
@@ -109,12 +153,10 @@ const statusBadge = {
 };
 
 const completeBtn = {
-  marginTop: 12,
-  padding: "8px 14px",
   background: "#28a745",
   color: "white",
   border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontWeight: "bold"
+  borderRadius: "6px",
+  padding: "8px 12px",
+  cursor: "pointer"
 };

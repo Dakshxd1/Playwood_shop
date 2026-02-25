@@ -85,4 +85,26 @@ router.delete("/:id", adminAuth, async (req, res) => {
   }
 });
 
+// ==============================
+// 🔒 UPDATE PRODUCT (Admin Only)
+// ==============================
+router.put("/:id", adminAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, type, thickness, price_per_sqft, description } = req.body;
+
+    await db.query(
+      `UPDATE products
+       SET name=?, type=?, thickness=?, price_per_sqft=?, description=?
+       WHERE id=?`,
+      [name, type, thickness, price_per_sqft, description, id]
+    );
+
+    res.json({ message: "Product updated successfully" });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;
