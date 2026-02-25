@@ -6,31 +6,30 @@ export default function ProductCard({ product, addToCart }) {
   const [width, setWidth] = useState("");
   const [qty, setQty] = useState(1);
 
-  const pricePerUnit = Number(product.price_per_sqft);
-
   const isAreaProduct =
     product.type === "Plywood" ||
     product.type === "Timber" ||
     product.type === "Door";
 
   const totalPrice = isAreaProduct
-    ? Number(length || 0) * Number(width || 0) * pricePerUnit
-    : Number(qty) * pricePerUnit;
+    ? Number(length || 0) * Number(width || 0) * product.price_per_sqft
+    : Number(qty) * product.price_per_sqft;
 
   const handleAdd = () => {
-    if (isAreaProduct && (!length || !width)) {
-      return alert("Enter length & width");
+    if (isAreaProduct) {
+      if (!length || !width) {
+        return alert("Enter length & width");
+      }
+    } else {
+      if (!qty || qty < 1) {
+        return alert("Enter valid quantity");
+      }
     }
 
-    if (!isAreaProduct && qty < 1) {
-      return alert("Enter valid quantity");
-    }
-
-    addToCart({
-      product,
-      length: Number(length),
-      width: Number(width),
-      qty: Number(qty),
+    addToCart(product, {
+      length: isAreaProduct ? Number(length) : null,
+      width: isAreaProduct ? Number(width) : null,
+      qty: isAreaProduct ? 1 : Number(qty),
       isAreaProduct,
       price: totalPrice
     });
@@ -45,8 +44,11 @@ export default function ProductCard({ product, addToCart }) {
 
       {product.thickness && <p>Thickness: {product.thickness}</p>}
 
-      <p>₹{pricePerUnit} {isAreaProduct ? "/sqft" : "each"}</p>
+      <p>
+        ₹{product.price_per_sqft} {isAreaProduct ? "/sqft" : "each"}
+      </p>
 
+      {/* AREA PRODUCTS */}
       {isAreaProduct ? (
         <>
           <input
@@ -67,11 +69,11 @@ export default function ProductCard({ product, addToCart }) {
           type="number"
           min="1"
           value={qty}
-          onChange={e => setQty(Number(e.target.value))}
+          onChange={e => setQty(e.target.value)}
         />
       )}
 
-      <p><b>Total: ₹{totalPrice}</b></p>
+      <p><b>Total: ₹{totalPrice || 0}</b></p>
 
       <button onClick={handleAdd}>Add to Cart</button>
     </div>

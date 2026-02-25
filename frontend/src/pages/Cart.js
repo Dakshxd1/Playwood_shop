@@ -1,18 +1,16 @@
 import React from "react";
 
-export default function Cart({ cart, setCart }) {
+export default function Cart({ cart, setCart, goToCheckout }) {
 
-  const updateQty = (index, newQty) => {
+  const updateQty = (index, qty) => {
     const updated = [...cart];
     const item = updated[index];
 
-    item.qty = Number(newQty);
-
-    const pricePerUnit = Number(item.product.price_per_sqft);
+    item.qty = Number(qty);
 
     item.price = item.isAreaProduct
-      ? item.length * item.width * pricePerUnit
-      : item.qty * pricePerUnit;
+      ? item.length * item.width * item.product.price_per_sqft
+      : item.qty * item.product.price_per_sqft;
 
     setCart(updated);
   };
@@ -21,7 +19,7 @@ export default function Cart({ cart, setCart }) {
     setCart(cart.filter((_, i) => i !== index));
   };
 
-  const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <div className="panel">
@@ -33,7 +31,6 @@ export default function Cart({ cart, setCart }) {
         <div key={i} className="card">
           <b>{item.product.name}</b>
 
-          {/* AREA PRODUCT */}
           {item.isAreaProduct ? (
             <p>Size: {item.length} × {item.width} ft</p>
           ) : (
@@ -60,6 +57,16 @@ export default function Cart({ cart, setCart }) {
       ))}
 
       <h3>Total: ₹{total}</h3>
+
+      {/* ✅ Checkout Button */}
+      {cart.length > 0 && (
+        <button
+          onClick={goToCheckout}
+          style={{ marginTop: 10, background: "#28a745" }}
+        >
+          Proceed to Checkout →
+        </button>
+      )}
     </div>
   );
 }

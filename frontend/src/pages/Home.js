@@ -11,14 +11,14 @@ export default function Home({ cart, setCart }) {
       .catch(err => console.error("Product load error:", err));
   }, []);
 
-  const addToCart = (item) => {
-    if (!item.price || item.price <= 0) {
-      alert("Please enter valid size or quantity");
+  const addToCart = (product, details) => {
+    if (!details.price || details.price <= 0) {
+      alert("Please enter size or quantity");
       return;
     }
-
-    setCart(prev => [...prev, item]);
-    alert(`${item.product.name} added to cart`);
+  
+    setCart(prev => [...prev, { product, ...details }]);
+    alert(`${product.name} added to cart`);
   };
 
   return (
