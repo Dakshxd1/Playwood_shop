@@ -23,8 +23,6 @@ function App() {
           <button onClick={() => setPage("cart")}>Cart ({cart.length})</button>
           <button onClick={() => setPage("checkout")}>Checkout</button>
           <button onClick={() => setPage("admin")}>Admin</button>
-
-          {/* ✅ NEW BUTTON */}
           <button onClick={() => setPage("orders")}>Orders</button>
 
           <button onClick={() => setDark(!dark)}>
@@ -34,10 +32,15 @@ function App() {
       </header>
 
       {page === "home" && <Home cart={cart} setCart={setCart} />}
-      {page === "cart" && <Cart cart={cart} setCart={setCart} />}
+      {page === "cart" && (
+        <Cart
+          cart={cart}
+          setCart={setCart}
+          goToCheckout={() => setPage("checkout")}
+        />
+      )}
       {page === "checkout" && <Checkout cart={cart} setCart={setCart} />}
 
-      {/* Admin login protection */}
       {page === "admin" &&
         (isAdmin ? (
           <AdminDashboard isAdmin={isAdmin} />
@@ -45,7 +48,6 @@ function App() {
           <AdminLogin setIsAdmin={setIsAdmin} />
         ))}
 
-      {/* 🔒 Orders page only for admin */}
       {page === "orders" &&
         (isAdmin ? (
           <AdminOrders />

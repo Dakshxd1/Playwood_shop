@@ -12,32 +12,43 @@ export default function ProductCard({ product, addToCart }) {
     product.type === "Door";
 
   const totalPrice = isAreaProduct
-    ? Number(length || 0) * Number(width || 0) * product.price_per_sqft
-    : Number(qty) * product.price_per_sqft;
+    ? (Number(length) || 0) *
+      (Number(width) || 0) *
+      Number(product.price_per_sqft)
+    : (Number(qty) || 0) *
+      Number(product.price_per_sqft);
 
   const handleAdd = () => {
     if (isAreaProduct) {
       if (!length || !width) {
-        return alert("Enter length & width");
+        alert("Enter length & width");
+        return;
       }
     } else {
       if (!qty || qty < 1) {
-        return alert("Enter valid quantity");
+        alert("Enter valid quantity");
+        return;
       }
     }
 
-    addToCart(product, {
+    // ✅ SEND ONE OBJECT
+    addToCart({
+      product,
       length: isAreaProduct ? Number(length) : null,
       width: isAreaProduct ? Number(width) : null,
       qty: isAreaProduct ? 1 : Number(qty),
       isAreaProduct,
       price: totalPrice
     });
+
+    setLength("");
+    setWidth("");
+    setQty(1);
   };
 
   return (
     <div className="card">
-      <ImageSlider images={product.images} />
+      <ImageSlider images={product.images || []} />
 
       <p className="badge">{product.type}</p>
       <h3>{product.name}</h3>
@@ -48,20 +59,19 @@ export default function ProductCard({ product, addToCart }) {
         ₹{product.price_per_sqft} {isAreaProduct ? "/sqft" : "each"}
       </p>
 
-      {/* AREA PRODUCTS */}
       {isAreaProduct ? (
         <>
           <input
             type="number"
             placeholder="Length (ft)"
             value={length}
-            onChange={e => setLength(e.target.value)}
+            onChange={(e) => setLength(e.target.value)}
           />
           <input
             type="number"
             placeholder="Width (ft)"
             value={width}
-            onChange={e => setWidth(e.target.value)}
+            onChange={(e) => setWidth(e.target.value)}
           />
         </>
       ) : (
@@ -69,11 +79,11 @@ export default function ProductCard({ product, addToCart }) {
           type="number"
           min="1"
           value={qty}
-          onChange={e => setQty(e.target.value)}
+          onChange={(e) => setQty(e.target.value)}
         />
       )}
 
-      <p><b>Total: ₹{totalPrice || 0}</b></p>
+      <p><b>Total: ₹{totalPrice}</b></p>
 
       <button onClick={handleAdd}>Add to Cart</button>
     </div>
