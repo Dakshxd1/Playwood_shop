@@ -60,10 +60,9 @@ const headerStyle = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "10px 20px",
+  padding: "12px 24px",
   background: "#5a3e2b",
-  color: "white",
-  marginBottom: "10px"   // reduced from 20px
+  color: "white"
 };
 
 export default App;

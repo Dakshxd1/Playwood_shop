@@ -24,6 +24,31 @@
   color: white;
 }
 
+/* NAV BUTTON CONTAINER */
+.nav-buttons {
+  display: flex;
+  gap: 12px;          /* ✅ space between buttons */
+  align-items: center;
+}
+
+/* NAV BUTTON */
+.nav-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: white;
+  color: #5a3e2b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+/* Hover */
+.nav-buttons button:hover {
+  background: #a67c52;
+  color: white;
+}
+
 .App-link {
   color: #61dafb;
 }
